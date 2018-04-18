@@ -28,3 +28,36 @@ $ node path/to/compose.js -v path/to/view -o path/to/output
 const compose = require('@shenfe/vsnippet');
 compose('path/to/view', 'path/to/output');
 ```
+
+### 示例
+
+运行`node ./compose.js -v example2`，即在`example2`中生成`index.html`、`index.css`文件，是example2的完整html和css。
+
+组件example2的vue形式源码：
+
+```vue
+<template lang="pug">
+div hello
+  example1
+</template>
+
+<script>
+import Example1 from '../example1'
+export default {
+  components: {
+    Example1
+  }
+}
+</script>
+```
+
+合成的组件example2的html、css：
+
+```html
+<div>hello<span data-v-24a2967e="" class="name">world</span></div>
+```
+
+```css
+.name[data-v-24a2967e]{color:#333}
+span{background-color:#000}
+```

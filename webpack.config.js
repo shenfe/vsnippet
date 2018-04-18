@@ -1,3 +1,4 @@
+const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
 const PrerenderSPAPlugin = require('prerender-spa-plugin')
@@ -5,6 +6,8 @@ const Renderer = PrerenderSPAPlugin.PuppeteerRenderer
 const ExtractTextPlugin = require("extract-text-webpack-plugin")
 
 const isPro = process.env.NODE_ENV === 'production'
+
+const babelConfig = JSON.parse(fs.readFileSync('.babelrc'))
 
 module.exports = {
     entry: './main.js',
@@ -17,13 +20,12 @@ module.exports = {
         rules: [
             {
                 test: /\.css$/,
-                use: isPro ? ExtractTextPlugin.extract({
-                    use: 'css-loader',
-                    fallback: 'vue-style-loader' // <- this is a dep of vue-loader, so no need to explicitly install if using npm3
-                }) : [
-                    'vue-style-loader',
-                    'css-loader'
-                ]
+                use: isPro
+                    ? ExtractTextPlugin.extract({
+                          use: 'css-loader',
+                          fallback: 'vue-style-loader' // <- this is a dep of vue-loader, so no need to explicitly install if using npm3
+                      })
+                    : ['vue-style-loader', 'css-loader']
             },
             {
                 test: /\.vue$/,
@@ -35,7 +37,13 @@ module.exports = {
             {
                 test: /\.js$/,
                 loader: 'babel-loader',
-                exclude: /node_modules/
+                // exclude: /node_modules/,
+                options: {
+                    presets: babelConfig.presets.map(preset => [
+                        require.resolve(`babel-preset-${Array.isArray(preset) ? preset[0] : preset}`),
+                        { modules: false }
+                    ])
+                }
             },
             {
                 test: /\.(png|jpg|gif|svg)$/,
@@ -48,7 +56,7 @@ module.exports = {
     },
     resolve: {
         alias: {
-            'vue$': 'vue/dist/vue.esm.js'
+            vue$: 'vue/dist/vue.esm.js'
         },
         extensions: ['*', '.js', '.vue', '.json']
     },
@@ -61,36 +69,38 @@ module.exports = {
         hints: false
     },
     devtool: isPro ? '#source-map' : '#eval-source-map',
-    plugins: !isPro ? [] : [
-        new webpack.DefinePlugin({
-            'process.env': {
-                NODE_ENV: '"production"'
-            }
-        }),
-        new ExtractTextPlugin('style.css'),
-        new PrerenderSPAPlugin({
-            // Required - The path to the webpack-outputted app to prerender
-            staticDir: path.join(__dirname),
+    plugins: !isPro
+        ? []
+        : [
+              new webpack.DefinePlugin({
+                  'process.env': {
+                      NODE_ENV: '"production"'
+                  }
+              }),
+              new ExtractTextPlugin('style.css'),
+              new PrerenderSPAPlugin({
+                  // Required - The path to the webpack-outputted app to prerender
+                  staticDir: path.join(__dirname),
 
-            // Optional - The path your rendered app should be output to.
-            outputDir: path.join(__dirname, '.dist'),
+                  // Optional - The path your rendered app should be output to.
+                  outputDir: path.join(__dirname, '.dist'),
 
-            // Required - Routes to render
-            routes: ['/'],
+                  // Required - Routes to render
+                  routes: ['/'],
 
-            // Optional - Minification
-            // minify: {
-            //     collapseBooleanAttributes: true,
-            //     collapseWhitespace: true,
-            //     decodeEntities: true,
-            //     keepClosingSlash: true,
-            //     sortAttributes: true
-            // },
+                  // Optional - Minification
+                  // minify: {
+                  //     collapseBooleanAttributes: true,
+                  //     collapseWhitespace: true,
+                  //     decodeEntities: true,
+                  //     keepClosingSlash: true,
+                  //     sortAttributes: true
+                  // },
 
-            // The actual renderer to use
-            renderer: new Renderer({
-                renderAfterDocumentEvent: 'render-event'
-            })
-        })
-    ]
-}
+                  // The actual renderer to use
+                  renderer: new Renderer({
+                      renderAfterDocumentEvent: 'render-event'
+                  })
+              })
+          ]
+};

@@ -23,7 +23,7 @@ const run = function (view, outputPath) {
     fs.writeFileSync(
         path.resolve(__dirname, './main.js'),
         fs.readFileSync(path.resolve(__dirname, './main.template.js'), 'utf8')
-            .replace('path/to/target', './' + targetPath.replace(/\\/g, '\\\\')),
+            .replace('path/to/target', './' + targetPath.replace(/\\/g, '/')),
         'utf8'
     );
 

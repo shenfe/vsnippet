@@ -4,18 +4,27 @@
 
 ## 静态html/css合成
 
-调用`compose`。
+调用`compose`，以一个vue文件为入口，将scss、vue等文件合成html、css。
 
 ### 命令行
 
+执行脚本：
+
 ```bash
 $ node path/to/compose.js -v path/to/view -o path/to/output
+```
+
+或npm命令：
+
+```json
+"scripts": {
+    "compose": "vcompose -v path/to/view -o path/to/output"
+}
 ```
 
 ### Node.js API
 
 ```js
 const compose = require('@shenfe/vsnippet');
-compose('./someViewInVue');
-compose('@shenfe/vsnippet/someSnippet', './someView');
+compose('path/to/view', 'path/to/output');
 ```

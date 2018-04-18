@@ -1,4 +1,8 @@
 {
+    "scripts": {
+        "test:cli": "vcompose -v test -o output1",
+        "test:api": "node ./test.js"
+    },
     "dependencies": {
         "@shenfe/vsnippet": "git@github.com:shenfe/vsnippet.git"
     }

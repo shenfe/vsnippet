@@ -6,6 +6,14 @@
 
 调用`compose`。
 
+### 命令行
+
+```bash
+$ node path/to/compose.js -v path/to/view -o path/to/output
+```
+
+### Node.js API
+
 ```js
 const compose = require('@shenfe/vsnippet');
 compose('./someViewInVue');

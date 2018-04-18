@@ -3,7 +3,7 @@ const path = require('path')
 const webpack = require('webpack')
 const PrerenderSPAPlugin = require('prerender-spa-plugin')
 const Renderer = PrerenderSPAPlugin.PuppeteerRenderer
-const ExtractTextPlugin = require("extract-text-webpack-plugin")
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 const isPro = process.env.NODE_ENV === 'production'
 

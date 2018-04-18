@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Example2 from '@shenfe/vsnippet/example2'
+import Example2 from 'vsnippet/example2/index.vue'
 export default {
   components: {
     Example2

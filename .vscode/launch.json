@@ -13,6 +13,17 @@
                 "-v",
                 "example2"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "compose2",
+            "program": "${workspaceFolder}/.test/node_modules/@shenfe/vsnippet/compose.js",
+            "args": [
+                "-v",
+                "example2"
+            ],
+            "cwd": "${workspaceFolder}/.test/node_modules/@shenfe/vsnippet"
         }
     ]
 }

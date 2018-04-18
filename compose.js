@@ -4,17 +4,26 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+const cwd = process.cwd();
+
+console.log('cwd', cwd);
+console.log('dirname', __dirname);
+
 const run = function (view, outputPath) {
-    const viewPath = path.resolve(process.cwd(), view);
+    const viewPath = path.resolve(cwd, view);
     if (!outputPath) {
         outputPath = viewPath;
     } else {
-        outputPath = path.resolve(process.cwd(), outputPath);
+        outputPath = path.resolve(cwd, outputPath);
     }
+    console.log('view', viewPath);
+    console.log('output', outputPath);
+    const targetPath = path.relative(__dirname, viewPath);
+    console.log('target', targetPath);
     fs.writeFileSync(
-        path.resolve(__dirname, 'main.js'),
+        path.resolve(__dirname, './main.js'),
         fs.readFileSync(path.resolve(__dirname, './main.template.js'), 'utf8')
-            .replace('path/to/target', './' + path.relative(__dirname, viewPath).replace(/[\\]+/g, '/')),
+            .replace('path/to/target', './' + targetPath.replace(/\\/g, '\\\\')),
         'utf8'
     );
 

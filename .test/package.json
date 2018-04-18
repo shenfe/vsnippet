@@ -1,0 +1,5 @@
+{
+    "dependencies": {
+        "@shenfe/vsnippet": "git@github.com:shenfe/vsnippet.git"
+    }
+}

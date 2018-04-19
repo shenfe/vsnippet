@@ -2,6 +2,10 @@
 
 > 前端视图层的片段组件库。使用scss、vue等形式编写和组织。既可以作为vue组件库，又可以作为view层公共代码库。**可以据此建立团队使用的基础样式和组件库。**
 
+## Philosophy
+
+使用开发vue组件的方式定义静态的基础组件以及组件的嵌套，html和css遵循就近原则，允许多种模板开发html，使用sass实现样式规则的更好复用，并利用vue的scope样式避免css污染。
+
 ## 静态html/css合成
 
 调用`compose`，以一个vue文件为入口，将scss、vue等文件合成一对html、css。

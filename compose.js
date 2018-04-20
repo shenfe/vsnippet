@@ -4,6 +4,9 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+const webpack = require('webpack');
+const webpackConfig = require('./webpack.config');
+
 const cwd = process.cwd();
 
 console.log('cwd', cwd);

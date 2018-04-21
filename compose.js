@@ -30,21 +30,26 @@ const run = function (view, outputPath) {
         'utf8'
     );
 
-    execSync('npm run build', {
-        cwd: __dirname,
-        stdio: [0, 1, 2]
+    return new Promise((resolve, reject) => {
+        webpack({
+            ...webpackConfig
+        }, (err, stats) => {
+            if (err || stats.hasErrors()) {
+                return reject(err || stats);
+            }
+            const htmlResult = fs.readFileSync(path.resolve(__dirname, './.dist/index.html'), 'utf8').match(/(?:<!--\sTEMPLATE_BEGIN\s-->)([\s\S]*?)(?:<!--\sTEMPLATE_END\s-->)/);
+            if (!htmlResult) return reject('html content not found');
+            const htmlContent = htmlResult[1].trim();
+            const cssContent = fs.readFileSync(path.resolve(__dirname, './.dist/style.css'), 'utf8');
+            fs.writeFileSync(path.resolve(outputPath, './index.html'), htmlContent, 'utf8');
+            fs.writeFileSync(path.resolve(outputPath, './index.css'), cssContent, 'utf8');
+            resolve({
+                html: htmlContent,
+                css: cssContent
+            });
+        }
+    );
     });
-
-    const htmlResult = fs.readFileSync(path.resolve(__dirname, './.dist/index.html'), 'utf8').match(/(?:<!--\sTEMPLATE_BEGIN\s-->)([\s\S]*?)(?:<!--\sTEMPLATE_END\s-->)/);
-    if (!htmlResult) return {};
-    const htmlContent = htmlResult[1].trim();
-    const cssContent = fs.readFileSync(path.resolve(__dirname, './.dist/style.css'), 'utf8');
-    fs.writeFileSync(path.resolve(outputPath, './index.html'), htmlContent, 'utf8');
-    fs.writeFileSync(path.resolve(outputPath, './index.css'), cssContent, 'utf8');
-    return {
-        html: htmlContent,
-        css: cssContent
-    };
 };
 
 if (require.main === module) {

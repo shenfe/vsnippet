@@ -1,6 +1,6 @@
 const compose = require('@shenfe/vsnippet');
 
-const { html, css } = compose('./test', './output2');
-
-console.log(html);
-console.log(css);
+compose('./test/index.vue', './output2').then(({ html, css }) => {
+    console.log(html);
+    console.log(css);
+});

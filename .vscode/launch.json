@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/compose.js",
             "args": [
                 "-v",
-                "example2"
+                "example1"
             ]
         },
         {

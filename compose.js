@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+process.env.NODE_ENV = 'production';
+
 const webpack = require('webpack');
 const webpackConfig = require('./webpack.config');
 
@@ -12,10 +14,19 @@ const cwd = process.cwd();
 console.log('cwd', cwd);
 console.log('dirname', __dirname);
 
+const isFile = filepath => fs.statSync(filepath).isFile();
+const isDir = filepath => fs.statSync(filepath).isDirectory();
+
 const run = function (view, outputPath) {
-    const viewPath = path.resolve(cwd, view);
+    let viewPath = path.resolve(cwd, view);
+    console.log('view', viewPath);
+    if (isDir(viewPath)) {
+        viewPath = path.resolve(viewPath, 'index.vue');
+    }
+    console.log('view', viewPath);
+    if (!fs.existsSync(viewPath)) return Promise.reject('target not found');
     if (!outputPath) {
-        outputPath = viewPath;
+        outputPath = path.dirname(viewPath);
     } else {
         outputPath = path.resolve(cwd, outputPath);
     }
@@ -37,15 +48,18 @@ const run = function (view, outputPath) {
             if (err || stats.hasErrors()) {
                 return reject(err || stats);
             }
-            const htmlResult = fs.readFileSync(path.resolve(__dirname, './.dist/index.html'), 'utf8').match(/(?:<!--\sTEMPLATE_BEGIN\s-->)([\s\S]*?)(?:<!--\sTEMPLATE_END\s-->)/);
-            if (!htmlResult) return reject('html content not found');
-            const htmlContent = htmlResult[1].trim();
-            const cssContent = fs.readFileSync(path.resolve(__dirname, './.dist/style.css'), 'utf8');
-            fs.writeFileSync(path.resolve(outputPath, './index.html'), htmlContent, 'utf8');
-            fs.writeFileSync(path.resolve(outputPath, './index.css'), cssContent, 'utf8');
-            resolve({
-                html: htmlContent,
-                css: cssContent
+            setTimeout(() => {
+                const htmlFile = fs.readFileSync(path.resolve(__dirname, './.dist/index.html'), 'utf8');
+                const htmlResult = htmlFile.match(/(?:<!--\sTEMPLATE_BEGIN\s-->)([\s\S]*?)(?:<!--\sTEMPLATE_END\s-->)/);
+                if (!htmlResult) return reject('html content not found');
+                const htmlContent = htmlResult[1].trim();
+                const cssContent = fs.readFileSync(path.resolve(__dirname, './.dist/style.css'), 'utf8');
+                fs.writeFileSync(path.resolve(outputPath, './index.html'), htmlContent, 'utf8');
+                fs.writeFileSync(path.resolve(outputPath, './index.css'), cssContent, 'utf8');
+                resolve({
+                    html: htmlContent,
+                    css: cssContent
+                });
             });
         }
     );
@@ -68,7 +82,9 @@ if (require.main === module) {
         }
     });
 
-    run(options.viewPath, options.outputPath);
+    run(options.viewPath, options.outputPath).catch(err => {
+        // console.log(err);
+    });
 }
 
 module.exports = run;

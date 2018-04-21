@@ -65,3 +65,7 @@ export default {
 .name[data-v-24a2967e]{color:#333}
 span{background-color:#000}
 ```
+
+## Thanks
+
+* [prerender-spa-plugin](https://github.com/chrisvfritz/prerender-spa-plugin)

@@ -7,13 +7,13 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 const isPro = process.env.NODE_ENV === 'production'
 
-const babelConfig = JSON.parse(fs.readFileSync('.babelrc'))
+const subDir = '.dist'
 
 module.exports = {
     entry: './main.js',
     output: {
-        path: path.resolve(__dirname, './.dist'),
-        publicPath: '/.dist/',
+        path: path.resolve(__dirname, `./${subDir}`),
+        publicPath: `/${subDir}/`,
         filename: 'bundle.js'
     },
     module: {
@@ -22,9 +22,9 @@ module.exports = {
                 test: /\.css$/,
                 use: isPro
                     ? ExtractTextPlugin.extract({
-                          use: 'css-loader',
-                          fallback: 'vue-style-loader' // <- this is a dep of vue-loader, so no need to explicitly install if using npm3
-                      })
+                        use: 'css-loader',
+                        fallback: 'vue-style-loader' // <- this is a dep of vue-loader, so no need to explicitly install if using npm3
+                    })
                     : ['vue-style-loader', 'css-loader']
             },
             {
@@ -37,13 +37,7 @@ module.exports = {
             {
                 test: /\.js$/,
                 loader: 'babel-loader',
-                // exclude: /node_modules/,
-                options: {
-                    presets: babelConfig.presets.map(preset => [
-                        require.resolve(`babel-preset-${Array.isArray(preset) ? preset[0] : preset}`),
-                        { modules: false }
-                    ])
-                }
+                // exclude: /node_modules/
             },
             {
                 test: /\.(png|jpg|gif|svg)$/,
@@ -72,35 +66,38 @@ module.exports = {
     plugins: !isPro
         ? []
         : [
-              new webpack.DefinePlugin({
-                  'process.env': {
-                      NODE_ENV: '"production"'
-                  }
-              }),
-              new ExtractTextPlugin('style.css'),
-              new PrerenderSPAPlugin({
-                  // Required - The path to the webpack-outputted app to prerender
-                  staticDir: path.join(__dirname),
+            new webpack.DefinePlugin({
+                'process.env': {
+                    NODE_ENV: '"production"'
+                }
+            }),
+            new ExtractTextPlugin('style.css'),
+            new PrerenderSPAPlugin({
+                // Required - The path to the webpack-outputted app to prerender
+                staticDir: __dirname,
 
-                  // Optional - The path your rendered app should be output to.
-                  outputDir: path.join(__dirname, '.dist'),
+                // Optional - The path your rendered app should be output to.
+                outputDir: path.resolve(__dirname, subDir),
 
-                  // Required - Routes to render
-                  routes: ['/'],
+                // Optional - The location of index.html
+                indexPath: path.resolve(__dirname, 'index.html'),
 
-                  // Optional - Minification
-                  // minify: {
-                  //     collapseBooleanAttributes: true,
-                  //     collapseWhitespace: true,
-                  //     decodeEntities: true,
-                  //     keepClosingSlash: true,
-                  //     sortAttributes: true
-                  // },
+                // Required - Routes to render
+                routes: ['/'],
 
-                  // The actual renderer to use
-                  renderer: new Renderer({
-                      renderAfterDocumentEvent: 'render-event'
-                  })
-              })
-          ]
+                // Optional - Minification
+                minify: {
+                    collapseBooleanAttributes: false,
+                    collapseWhitespace: false,
+                    decodeEntities: false,
+                    keepClosingSlash: false,
+                    sortAttributes: false
+                },
+
+                // The actual renderer to use
+                renderer: new Renderer({
+                    renderAfterDocumentEvent: 'render-event'
+                })
+            })
+        ]
 };

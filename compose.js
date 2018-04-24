@@ -17,7 +17,7 @@ console.log('dirname', __dirname);
 const isFile = filepath => fs.statSync(filepath).isFile();
 const isDir = filepath => fs.statSync(filepath).isDirectory();
 
-const run = function (view, outputPath) {
+const run = async function (view, outputPath) {
     let viewPath = path.resolve(cwd, view);
     console.log('view', viewPath);
     if (isDir(viewPath)) {
@@ -41,29 +41,24 @@ const run = function (view, outputPath) {
         'utf8'
     );
 
-    return new Promise((resolve, reject) => {
-        webpack({
-            ...webpackConfig
-        }, (err, stats) => {
-            if (err || stats.hasErrors()) {
-                return reject(err || stats);
-            }
-            setTimeout(() => {
-                const htmlFile = fs.readFileSync(path.resolve(__dirname, './.dist/index.html'), 'utf8');
-                const htmlResult = htmlFile.match(/(?:<!--\sTEMPLATE_BEGIN\s-->)([\s\S]*?)(?:<!--\sTEMPLATE_END\s-->)/);
-                if (!htmlResult) return reject('html content not found');
-                const htmlContent = htmlResult[1].trim();
-                const cssContent = fs.readFileSync(path.resolve(__dirname, './.dist/style.css'), 'utf8');
-                fs.writeFileSync(path.resolve(outputPath, './index.html'), htmlContent, 'utf8');
-                fs.writeFileSync(path.resolve(outputPath, './index.css'), cssContent, 'utf8');
-                resolve({
-                    html: htmlContent,
-                    css: cssContent
-                });
-            });
-        }
-    );
+    execSync('npm run build', {
+        cwd: __dirname,
+        stdio: [0, 1, 2]
     });
+
+    const htmlPath = path.resolve(__dirname, './.dist/index.html');
+    const cssPath = path.resolve(__dirname, './.dist/style.css');
+    const htmlFile = fs.readFileSync(htmlPath, 'utf8');
+    const htmlResult = htmlFile.match(/(?:<!--\sTEMPLATE_BEGIN\s-->)([\s\S]*?)(?:<!--\sTEMPLATE_END\s-->)/);
+    if (!htmlResult) return {};
+    const htmlContent = htmlResult[1].trim();
+    const cssContent = fs.existsSync(cssPath) ? fs.readFileSync(cssPath, 'utf8') : '';
+    fs.writeFileSync(path.resolve(outputPath, './index.html'), htmlContent, 'utf8');
+    cssContent !== '' && fs.writeFileSync(path.resolve(outputPath, './index.css'), cssContent, 'utf8');
+    return {
+        html: htmlContent,
+        css: cssContent
+    };
 };
 
 if (require.main === module) {

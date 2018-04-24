@@ -4,6 +4,6 @@
         "test:api": "node ./test.js"
     },
     "dependencies": {
-        "@shenfe/vsnippet": "git@github.com:shenfe/vsnippet.git"
+        "@shenfe/vsnippet": "git@github.com:shenfe/vsnippet.git#v0.0.1"
     }
 }

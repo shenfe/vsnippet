@@ -9,6 +9,8 @@ process.env.NODE_ENV = 'production';
 const webpack = require('webpack');
 const webpackConfig = require('./webpack.config');
 
+const subDir = '.dist';
+
 const cwd = process.cwd();
 
 console.log('cwd', cwd);
@@ -46,8 +48,8 @@ const run = async function (view, outputPath) {
         stdio: [0, 1, 2]
     });
 
-    const htmlPath = path.resolve(__dirname, './.dist/index.html');
-    const cssPath = path.resolve(__dirname, './.dist/style.css');
+    const htmlPath = path.resolve(__dirname, `./${subDir}/index.html`);
+    const cssPath = path.resolve(__dirname, `./${subDir}/style.css`);
     const htmlFile = fs.readFileSync(htmlPath, 'utf8');
     const htmlResult = htmlFile.match(/(?:<!--\sTEMPLATE_BEGIN\s-->)([\s\S]*?)(?:<!--\sTEMPLATE_END\s-->)/);
     if (!htmlResult) return {};
